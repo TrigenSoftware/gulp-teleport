@@ -50,7 +50,7 @@ const gulp   = require('gulp'),
 
 gulp.task('favicon', () => 
     gulp.src('src/favicon.svg')
-        .pipe(favicon({
+        .pipe(favicons({
             ...
             path:     'favicons/',
             html:     'favicons.html',
@@ -61,7 +61,7 @@ gulp.task('favicon', () =>
 );
 
 gulp.task('html', gulp.series('favicon', () =>
-    gulp.src(paths.html)
+    gulp.src('src/*.html')
         .pipe(teleport.wait('favicons'))
         .pipe(replace(
             '<link rel="shortcut icon" href="favicon.svg">',
