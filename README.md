@@ -17,7 +17,7 @@ yarn add -D gulp-teleport
 
 # About
 
-By using this plugin you can teleport files between file-streams.
+By using this plugin you can teleport files between streams.
 
 # API
 
