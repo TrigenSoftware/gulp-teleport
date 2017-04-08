@@ -44,30 +44,30 @@ Wait group of files.
 # Example 
 ```js
 const gulp   = require('gulp'),
-	favicons = require('gulp-favicons'),
-	htmlmin  = require('gulp-htmlmin'),
-	teleport = require('gulp-teleport');
+    favicons = require('gulp-favicons'),
+    htmlmin  = require('gulp-htmlmin'),
+    teleport = require('gulp-teleport');
 
 gulp.task('favicon', () => 
-	gulp.src('src/favicon.svg')
-		.pipe(favicon({
-			...
-			path:     'favicons/',
-			html:     'favicons.html',
-			pipeHTML: true
-		}))
-		.pipe(teleport.from('favicons', '**/*.html'))
-		.pipe(gulp.dest('dist/favicons'))
+    gulp.src('src/favicon.svg')
+        .pipe(favicon({
+            ...
+            path:     'favicons/',
+            html:     'favicons.html',
+            pipeHTML: true
+        }))
+        .pipe(teleport.from('favicons', '**/*.html'))
+        .pipe(gulp.dest('dist/favicons'))
 );
 
 gulp.task('html', gulp.series('favicon', () =>
-	gulp.src(paths.html)
-		.pipe(teleport.wait('favicons'))
-		.pipe(replace(
-			'<link rel="shortcut icon" href="favicon.svg">',
-			() => teleport.get('favicons', true).join(''))
-		))
-		.pipe(htmlmin({...}))
-		.pipe(gulp.dest('dist'))
+    gulp.src(paths.html)
+        .pipe(teleport.wait('favicons'))
+        .pipe(replace(
+            '<link rel="shortcut icon" href="favicon.svg">',
+            () => teleport.get('favicons', true).join(''))
+        ))
+        .pipe(htmlmin({...}))
+        .pipe(gulp.dest('dist'))
 ));
 ```
