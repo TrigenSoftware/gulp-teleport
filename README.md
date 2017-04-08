@@ -21,23 +21,23 @@ By using this plugin you can teleport files between streams.
 
 # API
 
-### `away(String globMask = false)`
+#### `away(String globMask = false)`
 
 Teleport away files matched by mask.
 
-### `from(String groupName, String globMask = false)`
+#### `from(String groupName, String globMask = false)`
 
 Teleport files matched by mask from current stream.
 
-### `to(String groupName, String globMask = false)`
+#### `to(String groupName, String globMask = false)`
 
 Teleport files matched by mask to current stream.
 
-### `get(String groupName, [String globMask = false,] Boolean toString = false)`
+#### `get(String groupName, [String globMask = false,] Boolean toString = false)`
 
 Get files from store by group name.
 
-### `wait(String groupName, String globMask = false, Number interval = 500)`
+#### `wait(String groupName, String globMask = false, Number interval = 500)`
 
 Wait group of files.
 
