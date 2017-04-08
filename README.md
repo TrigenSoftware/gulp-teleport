@@ -33,7 +33,7 @@ Teleport files matched by mask from current stream.
 
 Teleport files matched by mask to current stream.
 
-#### `get(String groupName, [String globMask = false,] Boolean toString = false)`
+#### `get(String groupName, [String globMask = false], Boolean toString = false)`
 
 Get files from store by group name.
 
