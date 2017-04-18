@@ -21,23 +21,31 @@ By using this plugin you can teleport files between streams.
 
 # API
 
-#### `away(String globMask = false)`
+#### `away(String pathMask = false)`
 
-Teleport away files matched by mask.
+Teleport away files matched by path.
 
-#### `from(String groupName, String globMask = false)`
+#### `clone(String groupName, String pathMask = false)`
 
-Teleport files matched by mask from current stream.
+Clone files matched by path from current stream to group in storage.
 
-#### `to(String groupName, String globMask = false)`
+#### `to(String groupName, String pathMask = false)`
 
-Teleport files matched by mask to current stream.
+Teleport files matched by path from current stream to group in storage.
 
-#### `get(String groupName, [String globMask = false], Boolean toString = false)`
+#### `from(String groupMask, String pathMask = false)`
+
+Teleport files matched by path to current stream from group in storage.
+
+#### `get(String groupMask, String pathMask = false)`
 
 Get files from store by group name.
 
-#### `wait(String groupName, String globMask = false, Number interval = 500)`
+#### `stream(String groupMask, String pathMask = false)`
+
+Get stream of files from store by group name.
+
+#### `wait(String groupMask, String pathMask = false, Number interval = 500)`
 
 Wait group of files.
 
@@ -65,7 +73,7 @@ gulp.task('html', gulp.series('favicon', () =>
         .pipe(teleport.wait('favicons'))
         .pipe(replace(
             '<link rel="shortcut icon" href="favicon.svg">',
-            () => teleport.get('favicons', true).join(''))
+            () => teleport.get('favicons').map(_ => _.contents.toString('utf8')).join('')
         ))
         .pipe(htmlmin({...}))
         .pipe(gulp.dest('dist'))

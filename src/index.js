@@ -1,48 +1,12 @@
-import minimatch from 'minimatch';
-import through   from 'through2';
+import { Readable } from 'readable-stream';
+import minimatch    from 'minimatch';
+import through      from 'through2';
+import * as Store   from './store';
 
-const store = new Map();
-
-function exist(key, mask = false) {
-
-	if (store.has(key)) {
-
-		const files = store.get(key);
-
-		if (!files.length) {
-			return false;
-		}
-
-		if (files.some(_ => !mask || minimatch(_.path, mask))) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-function push(key, files) {
-
-	if (!store.has(key)) {
-		store.set(key, []);
-	}
-
-	store.set(key, files);
-}
-
-function shift(key, mask = false) {
-
-	if (!store.has(key)) {
-		return [];
-	}
-
-	return store.get(key).filter(_ => !mask || minimatch(_.path, mask));
-}
-
-export function away(mask = false) {
+export function away(pathMask = false) {
 	return through.obj((file, enc, next) => {
 
-		if (!mask || minimatch(file.path, mask)) {
+		if (!pathMask || minimatch(file.path, pathMask)) {
 			return next();
 		}
 
@@ -50,13 +14,31 @@ export function away(mask = false) {
 	});
 }
 
-export function from(key, mask = false) {
+export function clone(key, pathMask = false) {
 
 	const files = [];
 
 	return through.obj((file, enc, next) => {
 
-		if (!mask || minimatch(file.path, mask)) {
+		if (!pathMask || minimatch(file.path, pathMask)) {
+			files.push(file.clone({ contents: false }));
+		}
+
+		return next(null, file);
+
+	}, function flush(next) {
+		Store.push(key, files);
+		next();
+	});
+}
+
+export function to(key, pathMask = false) {
+
+	const files = [];
+
+	return through.obj((file, enc, next) => {
+
+		if (!pathMask || minimatch(file.path, pathMask)) {
 			files.push(file);
 			return next();
 		}
@@ -64,49 +46,62 @@ export function from(key, mask = false) {
 		return next(null, file);
 
 	}, function flush(next) {
-		push(key, files);
+		Store.push(key, files);
 		next();
 	});
 }
 
-export function to(key, mask = false) {
+export function from(keyMaskOrArray, pathMask = false) {
+
 	return through.obj((file, enc, next) => {
 		next(null, file);
 	}, function flush(next) {
-		shift(key, mask).forEach(_ => this.push(_));
+		Store.shift(keyMaskOrArray, pathMask)
+			.forEach(_ => this.push(_));
 		next();
 	});
 }
 
-export function get(key, _maskOrToString, _toString) {
-
-	const mask = typeof _maskOrToString == 'string'
-			? _maskOrToString
-			: false,
-		toString = _toString || typeof _maskOrToString == 'boolean' && _maskOrToString;
-
-	let files = shift(key, mask);
-
-	if (toString) {
-		files = files.map(_ => _.contents.toString('utf8'));
-	}
-
-	return files;
+export function get(keyMaskOrArray, pathMask = false) {
+	return Store.shift(keyMaskOrArray, pathMask);
 }
 
-export function wait(key, mask = false, timeout = 500) {
-	return through.obj((file, enc, next) => {
+export function stream(keyMaskOrArray, pathMask = false, timeout) {
 
-		if (exist(key, mask)) {
+	const stream = new Readable({
+		objectMode:    true,
+		highWaterMark: 16
+	});
+
+	stream._read = () => {};
+	stream.push(null);
+
+	return stream
+		.pipe(wait(keyMaskOrArray, pathMask, timeout))
+		.pipe(from(keyMaskOrArray, pathMask));
+}
+
+export function wait(keyMaskOrArray, pathMask = false, timeout) {
+	return through.obj((file, enc, next) => {
+		waitStoreGroup(keyMaskOrArray, pathMask, timeout).then(() => {
 			next(null, file);
+		});
+	});
+}
+
+function waitStoreGroup(keyMaskOrArray, pathMask = false, timeout = 500) {
+	return new Promise((resolve) => {
+
+		if (Store.exist(keyMaskOrArray, pathMask)) {
+			resolve();
 			return;
 		}
 
 		const waitInterval = setInterval(() => {
 
-			if (exist(key, mask)) {
+			if (Store.exist(keyMaskOrArray, pathMask)) {
 				clearInterval(waitInterval);
-				next(null, file);
+				resolve();
 				return;
 			}
 
