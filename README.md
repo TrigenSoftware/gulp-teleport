@@ -21,7 +21,7 @@ By using this plugin you can teleport files between streams.
 
 # API
 
-## Object teleport
+## `Object teleport`
 
 *gulp-teleport*
 
@@ -92,7 +92,7 @@ gulp.task('html', gulp.series('favicon', () =>
 ));
 ```
 
-## class TeleportFs
+## `class TeleportFs`
 
 *gulp-teleport/lib/fs*
 
