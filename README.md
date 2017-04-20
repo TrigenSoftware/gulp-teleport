@@ -102,7 +102,7 @@ Fs proxy contructor, compatible with Node’s own `fs` module interface.
 
 ### Example
 ```js
-const webpackCompiler = webpack({...}));
+const webpackCompiler = webpack({...});
 
 webpackCompiler.outputFileSystem = new TeleportFs((stream, dest) => {
 
