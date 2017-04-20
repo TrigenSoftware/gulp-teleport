@@ -1,7 +1,16 @@
 import { Readable } from 'readable-stream';
 import minimatch    from 'minimatch';
 import through      from 'through2';
+import Vinyl        from 'vinyl';
 import * as Store   from './store';
+
+export function get(keyMaskOrArray, pathMask = false) {
+	return Store.shift(keyMaskOrArray, pathMask);
+}
+
+export function set(key, files) {
+	Store.push(key, files.filter(_ => Vinyl.isVinyl(_)));
+}
 
 export function away(pathMask = false) {
 	return through.obj((file, enc, next) => {
@@ -46,27 +55,36 @@ export function to(key, pathMask = false) {
 		return next(null, file);
 
 	}, function flush(next) {
-		Store.push(key, files);
+		set(key, files);
 		next();
 	});
 }
 
 export function from(keyMaskOrArray, pathMask = false) {
-
 	return through.obj((file, enc, next) => {
 		next(null, file);
 	}, function flush(next) {
-		Store.shift(keyMaskOrArray, pathMask)
+		get(keyMaskOrArray, pathMask)
 			.forEach(_ => this.push(_));
 		next();
 	});
 }
 
-export function get(keyMaskOrArray, pathMask = false) {
-	return Store.shift(keyMaskOrArray, pathMask);
+export function stream(keyMaskOrArray, pathMask = false) {
+
+	const stream = new Readable({
+		objectMode:    true,
+		highWaterMark: 16
+	});
+
+	stream._read = () => {};
+	stream.push(null);
+
+	return stream
+		.pipe(from(keyMaskOrArray, pathMask));
 }
 
-export function stream(keyMaskOrArray, pathMask = false, timeout) {
+export function waitStream(keyMaskOrArray, pathMask = false, timeout) {
 
 	const stream = new Readable({
 		objectMode:    true,

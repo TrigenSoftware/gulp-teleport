@@ -1,6 +1,6 @@
 {
   "name": "gulp-teleport",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Teleport for stream chunks.",
   "main": "lib/index.js",
   "scripts": {
@@ -19,7 +19,8 @@
   "dependencies": {
     "minimatch": "^3.0.3",
     "readable-stream": "^2.2.9",
-    "through2": "^2.0.3"
+    "through2": "^2.0.3",
+    "vinyl": "^2.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
