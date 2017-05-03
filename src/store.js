@@ -56,7 +56,9 @@ export function push(key, files) {
 		store.set(key, []);
 	}
 
-	store.set(key, files);
+	if (files.length) {
+		store.set(key, files);
+	}
 }
 
 export function shift(keyMaskOrArray, pathMask = false) {
