@@ -50,7 +50,7 @@ export default class TeleportFs {
 		stream._read = () => {};
 
 		if (close) {
-			stream.emit('close');
+			stream.push(null);
 		}
 
 		return stream;

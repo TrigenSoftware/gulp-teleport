@@ -64,8 +64,9 @@ export function from(keyMaskOrArray, pathMask = false) {
 	return through.obj((file, enc, next) => {
 		next(null, file);
 	}, function flush(next) {
-		get(keyMaskOrArray, pathMask)
-			.forEach(_ => this.push(_));
+		get(keyMaskOrArray, pathMask).forEach(_ =>
+			this.push(_)
+		);
 		next();
 	});
 }
@@ -78,10 +79,13 @@ export function stream(keyMaskOrArray, pathMask = false) {
 	});
 
 	stream._read = () => {};
+
+	get(keyMaskOrArray, pathMask).forEach(_ =>
+		stream.push(_)
+	);
 	stream.push(null);
 
-	return stream
-		.pipe(from(keyMaskOrArray, pathMask));
+	return stream;
 }
 
 export function waitStream(keyMaskOrArray, pathMask = false, timeout) {
@@ -92,11 +96,15 @@ export function waitStream(keyMaskOrArray, pathMask = false, timeout) {
 	});
 
 	stream._read = () => {};
-	stream.push(null);
 
-	return stream
-		.pipe(wait(keyMaskOrArray, pathMask, timeout))
-		.pipe(from(keyMaskOrArray, pathMask));
+	waitStoreGroup(keyMaskOrArray, pathMask, timeout).then(() => {
+		get(keyMaskOrArray, pathMask).forEach(_ =>
+			stream.push(_)
+		);
+		stream.push(null);
+	});
+
+	return stream;
 }
 
 export function wait(keyMaskOrArray, pathMask = false, timeout) {
