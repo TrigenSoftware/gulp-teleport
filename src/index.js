@@ -4,7 +4,8 @@ import through      from 'through2';
 import Vinyl        from 'vinyl';
 import * as Store   from './store';
 
-const defaultTimeout = 500;
+const defaultTimeot = 60000,
+	defaultInterval = 500;
 
 export function get(keyMaskOrArray, pathMask = false) {
 	return Store.shift(keyMaskOrArray, pathMask);
@@ -66,9 +67,9 @@ export function from(keyMaskOrArray, pathMask = false) {
 	return through.obj((file, enc, next) => {
 		next(null, file);
 	}, function flush(next) {
-		get(keyMaskOrArray, pathMask).forEach(_ =>
-			this.push(_)
-		);
+		get(keyMaskOrArray, pathMask).forEach((_) => {
+			this.push(_);
+		});
 		next();
 	});
 }
@@ -82,15 +83,15 @@ export function stream(keyMaskOrArray, pathMask = false) {
 
 	stream._read = () => {};
 
-	get(keyMaskOrArray, pathMask).forEach(_ =>
-		stream.push(_)
-	);
+	get(keyMaskOrArray, pathMask).forEach((_) => {
+		stream.push(_);
+	});
 	stream.push(null);
 
 	return stream;
 }
 
-export function waitStream(keyMaskOrArray, pathMask = false, timeout) {
+export function waitStream(keyMaskOrArray, pathMask = false, timeout, interval) {
 
 	const stream = new Readable({
 		objectMode:    true,
@@ -99,40 +100,54 @@ export function waitStream(keyMaskOrArray, pathMask = false, timeout) {
 
 	stream._read = () => {};
 
-	waitStoreGroup(keyMaskOrArray, pathMask, timeout).then(() => {
-		get(keyMaskOrArray, pathMask).forEach(_ =>
-			stream.push(_)
-		);
+	waitStoreGroup(keyMaskOrArray, pathMask, timeout, interval).then(() => {
+		get(keyMaskOrArray, pathMask).forEach((_) => {
+			stream.push(_);
+		});
 		stream.push(null);
+	}).catch((err) => {
+		stream.emit('error', err);
 	});
 
 	return stream;
 }
 
-export function wait(keyMaskOrArray, pathMask = false, timeout) {
+export function wait(keyMaskOrArray, pathMask = false, timeout, interval) {
 	return through.obj((file, enc, next) => {
-		waitStoreGroup(keyMaskOrArray, pathMask, timeout).then(() => {
+		waitStoreGroup(keyMaskOrArray, pathMask, timeout, interval).then(() => {
 			next(null, file);
+		}).catch((err) => {
+			next(err);
 		});
 	});
 }
 
-function waitStoreGroup(keyMaskOrArray, pathMask = false, timeout = defaultTimeout) {
-	return new Promise((resolve) => {
+function waitStoreGroup(keyMaskOrArray, pathMask = false, timeout = defaultTimeot, interval = defaultInterval) {
+	return new Promise((resolve, reject) => {
 
 		if (Store.exist(keyMaskOrArray, pathMask)) {
 			resolve();
 			return;
 		}
 
-		const waitInterval = setInterval(() => {
+		let waitInterval = null,
+			waitTimeout = null;
+
+		waitInterval = setInterval(() => {
 
 			if (Store.exist(keyMaskOrArray, pathMask)) {
 				clearInterval(waitInterval);
+				clearTimeout(waitTimeout);
 				resolve();
 				return;
 			}
 
+		}, interval);
+
+		waitTimeout = setTimeout(() => {
+			clearTimeout(waitTimeout);
+			clearInterval(waitInterval);
+			reject(new Error('Wait timeout exceeded'));
 		}, timeout);
 	});
 }

@@ -53,11 +53,11 @@ Teleport files matched by path to current stream from group in storage.
 
 Get stream of files from store by group name.
 
-#### `waitStream(String|Array<String> groupMask, String pathMask = false)`
+#### `waitStream(String|Array<String> groupMask, String pathMask = false, Number timeout = 1min, Number checkInterval = 500)`
 
 Wait and get stream of files from store by group name.
 
-#### `wait(String|Array<String> groupMask, String pathMask = false, Number interval = 500)`
+#### `wait(String|Array<String> groupMask, String pathMask = false, Number timeout = 1min, Number checkInterval = 500)`
 
 Wait group of files.
 
