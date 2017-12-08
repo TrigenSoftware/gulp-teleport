@@ -1,17 +1,25 @@
-[![NPM](https://nodei.co/npm/gulp-teleport.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/gulp-teleport/)
-
 # gulp-teleport
+
+[![NPM version][npm]][npm-url]
+[![Node version][node]][node-url]
+[![Dependency status][deps]][deps-url]
+
+[npm]: https://img.shields.io/npm/v/gulp-teleport.svg
+[npm-url]: https://www.npmjs.com/package/gulp-teleport
+
+[node]: https://img.shields.io/node/v/gulp-teleport.svg
+[node-url]: https://nodejs.org
+
+[deps]: https://img.shields.io/david/TrigenSoftware/gulp-teleport.svg
+[deps-url]: https://david-dm.org/TrigenSoftware/gulp-teleport
 
 Teleport for stream chunks.
 
-# Getting Started
+# Install
 
-Install with npm
 ```bash
 npm i -D gulp-teleport
-```
-or
-```bash
+# or
 yarn add -D gulp-teleport
 ```
 
@@ -114,3 +122,6 @@ webpackCompiler.outputFileSystem = new TeleportFs((stream, dest) => {
         .pipe(gulp.dest(dest));
 });
 ```
+
+---
+[![NPM](https://nodei.co/npm/gulp-teleport.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/gulp-teleport/)

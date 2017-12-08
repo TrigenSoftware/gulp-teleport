@@ -4,6 +4,8 @@ import through      from 'through2';
 import Vinyl        from 'vinyl';
 import * as Store   from './store';
 
+const defaultTimeout = 500;
+
 export function get(keyMaskOrArray, pathMask = false) {
 	return Store.shift(keyMaskOrArray, pathMask);
 }
@@ -115,7 +117,7 @@ export function wait(keyMaskOrArray, pathMask = false, timeout) {
 	});
 }
 
-function waitStoreGroup(keyMaskOrArray, pathMask = false, timeout = 500) {
+function waitStoreGroup(keyMaskOrArray, pathMask = false, timeout = defaultTimeout) {
 	return new Promise((resolve) => {
 
 		if (Store.exist(keyMaskOrArray, pathMask)) {

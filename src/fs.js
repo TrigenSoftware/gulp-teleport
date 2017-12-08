@@ -1,10 +1,10 @@
 /* eslint no-sync: 0 */
+import Path from 'path';
+import Fs from 'fs';
 import { Readable, Writable } from 'readable-stream';
 import minimatch from 'minimatch';
-import mkdirp    from 'mkdirp';
-import Vinyl     from 'vinyl';
-import Path      from 'path';
-import Fs        from 'fs';
+import mkdirp from 'mkdirp';
+import Vinyl from 'vinyl';
 
 const defaultFs = {
 	...Fs, mkdirp,
