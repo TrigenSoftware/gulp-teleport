@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "minimatch": "^3.0.4",
-    "readable-stream": "^2.3.3",
+    "readable-stream": "^3.4.0",
     "through2": "^2.0.3",
     "vinyl": "^2.1.0"
   },
